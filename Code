@@ -1,0 +1,66 @@
+from pygame import*
+
+
+
+window = display.set_mode((750,500))
+background = transform.scale(image.load('background.jpeg'), (800,500))
+
+mixer.init()
+mixer.music.load('Butterfly effect music.mp3')
+mixer.music.set_volume(0.1)
+mixer.music.play()
+
+class GameSprite(sprite.Sprite):
+    def __init__(self,player_image,player_x,player_y,size_x,size_y,player_speed):
+        super().__init__()
+
+        self.image = transform.scale(image.load(player_image), (size_x,size_y))
+        self.speed = player_speed
+
+        self.rect = self.image.get_rect()
+        self.rect.x = player_x
+        self.rect.y = player_y
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+class Player(GameSprite):
+    def update1(self):
+        keys = key.get_pressed()
+        if keys[K_w]:
+            self.rect.y -= self.speed
+        if keys[K_s]:
+            self.rect.y += self.speed
+    def update2(self):
+        keys = key.get_pressed()
+        if keys[K_UP]:
+            self.rect.y -= self.speed
+        if keys[K_DOWN]:
+            self.rect.y += self.speed
+barrier1 = Player('barrier.png',30,120,90,100,25)
+barrier2 = Player('barrier.png',650,120,90,100,25)
+ball = GameSprite("ball.png",200,0,100,100,0)
+run=True
+FPS=60
+
+clock = time.Clock()
+name = 3
+name2 = 3
+while run:
+    for e in event.get():
+        if e.type == QUIT:
+            run = False
+    ball.rect.x += name
+    ball.rect.y += name2
+    if sprite.collide_rect(barrier1,ball) or sprite.collide_rect(barrier2, ball):
+        name = name * (-1)
+    if ball.rect.y <0 or ball.rect.y > 450:
+        name2 = name2* (-1)
+    window.blit(background,(0,0))
+    barrier1.reset()
+    barrier2.reset()
+    ball.reset()
+    barrier1.update1()
+    barrier2.update2()
+    ball.update()
+    display.update()
+    clock.tick(FPS)
